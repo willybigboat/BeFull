@@ -3,7 +3,7 @@ import { Request, response, Response } from "express";
 import { UserService } from "../Service/UserService";
 import { resp } from "../utils/resp";
 import { DBResp } from "../interfaces/DBResp";
-import { Student } from "../interfaces/Student";
+import { Student } from "../interfaces/restaurant";
 require('dotenv').config()
 
 export class UserController extends Contorller {
@@ -39,6 +39,16 @@ export class UserController extends Contorller {
         const resp = await this.service.insertOne(Request.body)
         Response.status(resp.code).send(resp)
     }
-
-
+    public async deletedById(Request: Request, Response:Response){
+        const resp = await this.service.deletedById(Request.query.id as string);
+        Response.status(resp.code).send(resp);
+    }
+    public async updateNameById(Request: Request, Response:Response){
+        const resp = await this.service.updateNameById(Request.query.id as string,Request.query.name as string);
+        Response.status(resp.code).send(resp);
+    }
+    public async findOneById(Request: Request, Response:Response){
+        const resp = await this.service.findOneById(Request.query.id as string);
+        Response.status(resp.code).send(resp);
+    }
 }
