@@ -1,5 +1,5 @@
 import { Controller } from "../abstract/Controller";
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { UserService } from "../Service/UserService";
 import { resp } from "../utils/resp";
 import { DBResp } from "../interfaces/DBResp";
@@ -15,7 +15,6 @@ export class UserController extends Controller {
     }
 
     public async findAll(Request: Request, Response: Response) {
-
         const res: resp<Array<DBResp<restaurant>> | undefined> = {
             code: 200,
             message: "",
@@ -25,30 +24,35 @@ export class UserController extends Controller {
         const dbResp = await this.service.getAllRestaurants();
         if (dbResp) {
             res.body = dbResp;
-            res.message = "find sucess";
+            res.message = "find success";
             Response.send(res);
         } else {
             res.code = 500;
             res.message = "server error";
             Response.status(500).send(res);
         }
-
     }
 
     public async insertOne(Request: Request, Response: Response) {
         const resp = await this.service.insertOne(Request.body)
         Response.status(resp.code).send(resp)
     }
-    public async deletedById(Request: Request, Response:Response){
-        const resp = await this.service.deletedById(Request.query.id as string);
+
+    public async deleteByName(Request: Request, Response: Response) {
+        const resp = await this.service.deleteByName(Request.query.name as string);
         Response.status(resp.code).send(resp);
     }
-    public async updateNameById(Request: Request, Response:Response){
-        const resp = await this.service.updateNameById(Request.query.id as string,Request.query.name as string);
+
+    public async updateName(Request: Request, Response: Response) {
+        const resp = await this.service.updateName(
+            Request.query.oldName as string,
+            Request.query.newName as string
+        );
         Response.status(resp.code).send(resp);
     }
-    public async findOneById(Request: Request, Response:Response){
-        const resp = await this.service.findOneById(Request.query.id as string);
+
+    public async findOneByName(Request: Request, Response: Response) {
+        const resp = await this.service.findOneByName(Request.query.name as string);
         Response.status(resp.code).send(resp);
     }
 }
