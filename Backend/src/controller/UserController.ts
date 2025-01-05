@@ -1,4 +1,4 @@
-import { Contorller } from "../abstract/Contorller";
+import { Controller } from "../abstract/Controller";
 import { Request, response, Response } from "express";
 import { UserService } from "../Service/UserService";
 import { resp } from "../utils/resp";
@@ -6,7 +6,7 @@ import { DBResp } from "../interfaces/DBResp";
 import { restaurant } from "../interfaces/restaurant";
 require('dotenv').config()
 
-export class UserController extends Contorller {
+export class UserController extends Controller {
     protected service: UserService;
 
     constructor() {
