@@ -17,7 +17,7 @@ function App() {
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [activeTab, setActiveTab] = useState<'intro' | 'home' | 'search' | 'add'>('intro');
   const [selectedArea, setSelectedArea] = useState<string>('');
-  const [searchResult, setSearchResult] = useState<Restaurant | null>(null);
+  const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -25,7 +25,7 @@ function App() {
     category: '',
     rating: ''
   });
-  const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
+
   const [searchName, setSearchName] = useState('');
   const [updateName, setUpdateName] = useState('');
 
@@ -33,6 +33,21 @@ function App() {
     '北投區', '士林區', '大同區', '中山區', '松山區', '內湖區',
     '萬華區', '中正區', '大安區', '信義區', '南港區', '文山區'
   ];
+
+  const calculateSimilarity = (str1: string, str2: string): number => {
+    const s1 = str1.toLowerCase();
+    const s2 = str2.toLowerCase();
+    if (s1.includes(s2) || s2.includes(s1)) {
+      return 1;
+    }
+    let common = 0;
+    for (let char of s1) {
+      if (s2.includes(char)) {
+        common++;
+      }
+    }
+    return common / Math.max(s1.length, s2.length);
+  };
 
   useEffect(() => {
     fetchRestaurants();
@@ -80,22 +95,6 @@ function App() {
     }
   };
 
-  const calculateSimilarity = (str1: string, str2: string): number => {
-    const s1 = str1.toLowerCase();
-    const s2 = str2.toLowerCase();
-    if (s1.includes(s2) || s2.includes(s1)) {
-      return 1;
-    }
-    // 計算共同字符數
-    let common = 0;
-    for (let char of s1) {
-      if (s2.includes(char)) {
-        common++;
-      }
-    }
-    return common / Math.max(s1.length, s2.length);
-  };
-
   const handleSearch = async () => {
     if (!searchName.trim()) {
       alert('請輸入餐廳名稱');
@@ -103,21 +102,19 @@ function App() {
     }
 
     try {
-      // 先獲取所有餐廳
       const response = await asyncGet(api.findAll);
       if (response.code === 200 && response.body) {
-        // 計算相似度並排序
         const results = response.body
           .map((restaurant: { name: string }) => ({
             ...restaurant,
             similarity: calculateSimilarity(restaurant.name, searchName)
           }))
-          .filter((r: { similarity: number }) => r.similarity > 0.3) // 過濾掉相似度太低的結果
+          .filter((r: { similarity: number }) => r.similarity > 0.3)
           .sort((a: { similarity: number }, b: { similarity: number }) => b.similarity - a.similarity)
-          .slice(0, 5); // 只取前5個最相近的結果
+          .slice(0, 5);
 
         setSearchResults(results);
-
+        
         if (results.length === 0) {
           alert('找不到相關餐廳');
         }
@@ -140,9 +137,7 @@ function App() {
         alert('更新成功');
         fetchRestaurants();
         setUpdateName('');
-        if (searchResult) {
-          handleSearch();
-        }
+        handleSearch();
       } else if (response.code === 400) {
         alert('新名稱已存在');
       }
@@ -159,9 +154,7 @@ function App() {
         if (response.code === 200) {
           alert('刪除成功');
           fetchRestaurants();
-          if (searchResult?.name === name) {
-            setSearchResult(null);
-          }
+          setSearchResults(prev => prev.filter(r => r.name !== name));
         }
       } catch (error) {
         alert('刪除失敗');
@@ -221,7 +214,24 @@ function App() {
 
             {activeTab === 'home' && (
               <div className="home-section">
-                {/* ... area-filters 部分保持不變 ... */}
+                <div className="area-filters">
+                  <button
+                    className={selectedArea === '' ? 'selected' : ''}
+                    onClick={() => setSelectedArea('')}
+                  >
+                    全部地區
+                  </button>
+                  {areas.map(area => (
+                    <button
+                      key={area}
+                      className={selectedArea === area ? 'selected' : ''}
+                      onClick={() => setSelectedArea(area)}
+                    >
+                      {area}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="restaurant-list">
                   {filteredRestaurants.map(restaurant => (
                     <div key={restaurant._id} className="restaurant-card">
