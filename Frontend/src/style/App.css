@@ -9,25 +9,45 @@ body {
   color: #fff;
   font-size: 20px;
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
+/* 修改 container，移除最大寬度限制 */
 .container {
-  max-width: 1440px;
-  margin: 0 auto;
   width: 100%;
   min-height: 100vh;
+  padding: 0;  /* 移除 padding */
+  margin: 0;   /* 移除 margin */
 }
 
+/* 修改 app-container，確保全寬 */
 .app-container {
   width: 100%;
   min-height: 100vh;
   background-color: #000;
+  display: flex;
+  justify-content: center;
 }
 
+/* 修改 content-wrapper，確保填滿寬度 */
 .content-wrapper {
   display: grid;
   grid-template-columns: minmax(200px, 15%) 1fr;
   width: 100%;
+  margin: 0;  /* 移除 margin */
+}
+
+/* 修改 main-content，確保內容區域填滿 */
+.main-content {
+  padding: 2rem;
+  background-color: #000;
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .header {
@@ -83,35 +103,30 @@ body {
   color: #000;
 }
 
-.main-content {
-  padding: 2rem;
-  background-color: #000;
-  overflow-y: auto;
+.intro-section,
+.home-section,
+.search-section,
+.add-form {
   width: 100%;
-}
-
-.intro-section {
+  height: 100%;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  gap: 2vh; /* 使用vh單位來自適應間距 */
+}
+
+.intro-section {
   justify-content: center;
-  height: calc(100vh - 80px);
-  text-align: center;
-  padding: 20px;
 }
 
 .intro-section .home-image {
   width: 100%;
-  max-width: 350px;
+  max-width: min(350px, 30vw); /* 使用vw單位來自適應寬度 */
   height: auto;
   aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #FFD700;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  background-color: #000;
+  margin-bottom: 3vh;
 }
 
 .intro-section .home-image img {
@@ -132,10 +147,13 @@ body {
 }
 
 .restaurant-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
   width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+  gap: 2rem;
+  padding: 1rem;
 }
 
 .restaurant-card {
@@ -155,14 +173,19 @@ body {
 .update-form,
 .add-form {
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  max-width: min(800px, 90%);
+  margin: 2vh auto;
+}
+
+.add-form {
+  max-width: min(800px, 90%);
+  gap: 2vh;
 }
 
 .add-form h2 {
   color: #FFD700;
   text-align: center;
+  margin-bottom: 3vh;
 }
 
 input {
@@ -201,33 +224,20 @@ button:hover {
 }
 
 .area-filters {
+  width: 100%;
+  padding: 1rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  justify-content: center;
 }
 
 .area-filters button {
-  background-color: transparent;
-  border: 1px solid #FFD700;
-  color: #FFD700;
-  padding: 0.5rem 1rem;
-  font-size: 20px;
-}
-
-.area-filters button.selected {
-  background-color: #FFD700;
-  color: #000;
-}
-
-.search-result {
-  margin-top: 2rem;
-  width: 100%;
 }
 
 @media screen and (max-width: 768px) {
   .container {
-    padding: 0 15px;
+    padding: 0;
   }
 
   .content-wrapper {
