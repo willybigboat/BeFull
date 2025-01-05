@@ -2,34 +2,32 @@ import { useEffect, useRef, useState } from 'react'
 import '../style/App.css'
 import { asyncGet, asyncDelete, asyncPost, asyncPut, asyncGetOne } from '../utils/fetch'
 import { api } from '../enum/api'
-import { Student } from '../interface/Student'
+import { restaurant } from '../interface/restaurant'
 import { resp } from '../interface/resp'
 
 function App() {
-  const [students, setStudents] = useState<Array<Student>>([])
-  const [id, setid] = useState("")
-  const [account, setaccount] = useState("")
-  const [name, setname] = useState("")
-  const [department, setdepartment] = useState("")
-  const [grade, setgrade] = useState("")
-  const [Class, setclass] = useState("")
-  const [Email, setemail] = useState("")
-  const [findid, setfindid] = useState("")
-  const [newName, setnewName] = useState("")
+  const [restaurants, setRestaurants] = useState<Array<restaurant>>([])
+  const [id, setId] = useState("")
+  const [name, setName] = useState("")
+  const [address, setAddress] = useState("")
+  const [cuisine, setCuisine] = useState("")
+  const [rating, setRating] = useState("")
+  const [findId, setFindId] = useState("")
+  const [newName, setNewName] = useState("")
   const [searchId, setSearchId] = useState("")
-  const [searchedStudent, setSearchedStudent] = useState<Student | null>(null)
+  const [searchedRestaurant, setSearchedRestaurant] = useState<restaurant | null>(null)
   const [activeTab, setActiveTab] = useState<'列表' | '搜尋' | '刪除' | '新增' | '更新'>('列表')
 
   const apiEndpoint = `${api.delete}?id=${id}`
 
-  async function handledelete() {
+  async function handleDelete() {
     try {
       const response = await asyncDelete(apiEndpoint)
-      if (response.code == 200) {
+      if (response.code === 200) {
         alert("刪除成功")
-        fetchStudents()
-      } else if (response.code == 404) {
-        alert("找不到使用者")
+        fetchRestaurants()
+      } else if (response.code === 404) {
+        alert("找不到餐廳")
       } else {
         alert("伺服器錯誤")
       }
@@ -42,18 +40,14 @@ function App() {
   async function insert() {
     try {
       const response = await asyncPost(api.insertOne, {
-        "userName": account,
         "name": name,
-        "department": department,
-        "grade": grade,
-        "class": Class,
-        "email": Email
+        "address": address,
+        "cuisine": cuisine,
+        "rating": rating
       })
-      if (response.code == 200) {
+      if (response.code === 200) {
         alert("新增成功")
-        fetchStudents()
-      } else if (response.code == 403) {
-        alert("重複的使用者帳號")
+        fetchRestaurants()
       } else {
         alert("伺服器錯誤")
       }
@@ -64,14 +58,14 @@ function App() {
   }
 
   async function update() {
-    const apiEndpoint = `${api.update}?id=${findid}&name=${newName}`
+    const apiEndpoint = `${api.update}?id=${findId}&name=${newName}`
     try {
       const response = await asyncPut(apiEndpoint)
-      if (response.code == 200) {
+      if (response.code === 200) {
         alert("更新成功")
-        fetchStudents()
-      } else if (response.code == 404) {
-        alert("找不到使用者")
+        fetchRestaurants()
+      } else if (response.code === 404) {
+        alert("找不到餐廳")
       } else {
         alert("伺服器錯誤")
       }
@@ -81,14 +75,14 @@ function App() {
     }
   }
 
-  async function searchStudent() {
+  async function searchRestaurant() {
     try {
       const response = await asyncGetOne(`${api.findOne}?id=${searchId}`)
-      if (response.code == 200 && response.body) {
-        setSearchedStudent(response.body)
+      if (response.code === 200 && response.body) {
+        setSearchedRestaurant(response.body)
       } else {
-        alert("找不到該學生")
-        setSearchedStudent(null)
+        alert("找不到該餐廳")
+        setSearchedRestaurant(null)
       }
     }
     catch (error) {
@@ -99,10 +93,10 @@ function App() {
 
   const cache = useRef<boolean>(false)
 
-  const fetchStudents = () => {
-    asyncGet(api.findAll).then((res: resp<Array<Student>>) => {
-      if (res.code == 200) {
-        setStudents(res.body)
+  const fetchRestaurants = () => {
+    asyncGet(api.findAll).then((res: resp<Array<restaurant>>) => {
+      if (res.code === 200) {
+        setRestaurants(res.body)
       }
     });
   }
@@ -110,59 +104,55 @@ function App() {
   useEffect(() => {
     if (!cache.current) {
       cache.current = true;
-      fetchStudents()
+      fetchRestaurants()
     }
   }, [])
 
-  const studentList = students ? students.map((student: Student) => {
+  const restaurantList = restaurants ? restaurants.map((restaurant: restaurant) => {
     return (
-      <div className='student' key={student._id}>
-        <p>ID: {student._id}</p>
-        <p>帳號: {student.userName}</p>
-        <p>座號: {student.sid}</p>
-        <p>姓名: {student.name}</p>
-        <p>院系: {student.department}</p>
-        <p>年级: {student.grade}</p>
-        <p>班级: {student.class}</p>
-        <p>Email: {student.email}</p>
-        <p>缺席次數: {student.absences ? student.absences : 0}</p>
+      <div className='restaurant' key={restaurant._id}>
+        <p>ID: {restaurant._id}</p>
+        <p>名稱: {restaurant.name}</p>
+        <p>地址: {restaurant.location}</p>
+        <p>料理類型: {restaurant.category}</p>
+        <p>評分: {restaurant.rating}</p>
       </div>
     )
   }) : "載入中..."
 
   return (
     <div className="app-container">
-      <h1>StudentHub</h1>
+      <h1>RestaurantHub</h1>
       <div className="tab-navigation">
         <button 
           className={`tab-btn ${activeTab === '列表' ? 'active' : ''}`} 
           onClick={() => setActiveTab('列表')}
         >
-          學生列表
+          餐廳列表
         </button>
         <button 
           className={`tab-btn ${activeTab === '搜尋' ? 'active' : ''}`} 
           onClick={() => setActiveTab('搜尋')}
         >
-          搜尋學生
+          搜尋餐廳
         </button>
         <button 
           className={`tab-btn ${activeTab === '刪除' ? 'active' : ''}`} 
           onClick={() => setActiveTab('刪除')}
         >
-          刪除學生
+          刪除餐廳
         </button>
         <button 
           className={`tab-btn ${activeTab === '新增' ? 'active' : ''}`} 
           onClick={() => setActiveTab('新增')}
         >
-          新增學生
+          新增餐廳
         </button>
         <button 
           className={`tab-btn ${activeTab === '更新' ? 'active' : ''}`} 
           onClick={() => setActiveTab('更新')}
         >
-          更新學生
+          更新餐廳
         </button>
       </div>
 
@@ -170,7 +160,7 @@ function App() {
         {activeTab === '列表' && (
           <div className='block'>
             <div className="container">
-              {studentList}
+              {restaurantList}
             </div>
           </div>
         )}
@@ -178,29 +168,25 @@ function App() {
         {activeTab === '搜尋' && (
           <div className="input-section">
             <div className="input-wrapper">
-              <label>以ID搜尋學生</label>
+              <label>以ID搜尋餐廳</label>
               <input
                 type="text"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
-                placeholder="輸入學生ID"
+                placeholder="輸入餐廳ID"
               />
-              <button onClick={searchStudent}>搜尋</button>
+              <button onClick={searchRestaurant}>搜尋</button>
             </div>
 
-            {searchedStudent && (
+            {searchedRestaurant && (
               <div className='block'>
                 <div className="container">
-                  <div className='student'>
-                    <p>ID: {searchedStudent._id}</p>
-                    <p>帳號: {searchedStudent.userName}</p>
-                    <p>座號: {searchedStudent.sid}</p>
-                    <p>姓名: {searchedStudent.name}</p>
-                    <p>院系: {searchedStudent.department}</p>
-                    <p>年级: {searchedStudent.grade}</p>
-                    <p>班级: {searchedStudent.class}</p>
-                    <p>Email: {searchedStudent.email}</p>
-                    <p>缺席次數: {searchedStudent.absences ? searchedStudent.absences : 0}</p>
+                  <div className='restaurant'>
+                    <p>ID: {searchedRestaurant._id}</p>
+                    <p>名稱: {searchedRestaurant.name}</p>
+                    <p>地址: {searchedRestaurant.location}</p>
+                    <p>料理類型: {searchedRestaurant.category}</p>
+                    <p>評分: {searchedRestaurant.rating}</p>
                   </div>
                 </div>
               </div>
@@ -211,87 +197,56 @@ function App() {
         {activeTab === '刪除' && (
           <div className="input-section">
             <div className="input-wrapper">
-              <label>以ID刪除學生</label>
+              <label>以ID刪除餐廳</label>
               <input
                 type="text"
                 value={id}
-                onChange={(e) => setid(e.target.value)}
-                placeholder="輸入學生ID"
+                onChange={(e) => setId(e.target.value)}
+                placeholder="輸入餐廳ID"
               />
-              <button onClick={handledelete}>刪除</button>
+              <button onClick={handleDelete}>刪除</button>
             </div>
           </div>
         )}
 
         {activeTab === '新增' && (
           <div className="input-section">
-            
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
-              <label>帳號</label>
-              <input
-                type="text"
-                value={account}
-                onChange={(e) => setaccount(e.target.value)}
-                placeholder="輸入帳號"
-              />
-            </div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper">
-              <label>姓名</label>
+              <label>名稱</label>
               <input
                 type="text"
                 value={name}
-                onChange={(e) => setname(e.target.value)}
-                placeholder="輸入姓名"
+                onChange={(e) => setName(e.target.value)}
+                placeholder="輸入餐廳名稱"
               />
             </div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
-              <label>院系</label>
+              <label>地址</label>
               <input
                 type="text"
-                value={department}
-                onChange={(e) => setdepartment(e.target.value)}
-                placeholder="輸入院系"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="輸入地址"
               />
             </div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper"></div> 
             <div className="input-wrapper">
-              <label>年级</label>
+              <label>料理類型</label>
               <input
                 type="text"
-                value={grade}
-                onChange={(e) => setgrade(e.target.value)}
-                placeholder="輸入年級"
+                value={cuisine}
+                onChange={(e) => setCuisine(e.target.value)}
+                placeholder="輸入料理類型"
               />
             </div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
-              <label>班级</label>
+              <label>評分</label>
               <input
                 type="text"
-                value={Class}
-                onChange={(e) => setclass(e.target.value)}
-                placeholder="輸入班级"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                placeholder="輸入評分"
               />
             </div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper">
-              <label>Email</label>
-              <input
-                type="text"
-                value={Email}
-                onChange={(e) => setemail(e.target.value)}
-                placeholder="輸入Email"
-              />
-            </div>
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
               <button onClick={insert}>新增</button>
             </div>
@@ -300,28 +255,24 @@ function App() {
 
         {activeTab === '更新' && (
           <div className="input-section">
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
               <label>查找ID</label>
               <input
                 type="text"
-                value={findid}
-                onChange={(e) => setfindid(e.target.value)}
+                value={findId}
+                onChange={(e) => setFindId(e.target.value)}
                 placeholder="輸入要更新的ID"
               />
             </div>
-            <div className="input-wrapper"></div>
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
-              <label>新姓名</label>
+              <label>新名稱</label>
               <input
                 type="text"
                 value={newName}
-                onChange={(e) => setnewName(e.target.value)}
-                placeholder="輸入新姓名"
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="輸入新名稱"
               />
             </div>
-            <div className="input-wrapper"></div>
             <div className="input-wrapper">
               <button onClick={update}>更新</button>
             </div>
