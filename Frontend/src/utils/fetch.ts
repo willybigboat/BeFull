@@ -1,117 +1,111 @@
 /**
- * 異步呼叫api, 只可用響應體為 json 的 api
- * @param api 要呼叫的api
- * @returns json 結果
+ * 共用的請求設定
  */
-export async function asyncGet(api: string): Promise<any> {
-    try {
-        const res: Response = await fetch(api)
-        try {
-            return await res.json()
-        } catch (error) {
-            return error
-        }
-    } catch (error) {
-        return error
-    }
-}
-
-export async function asyncPost(api: string, body: {} | FormData) {
-    const res: Response = await fetch(api, {
-        method: 'POST',
-        credentials: 'include',
-        headers: new Headers({
-            'Access-Control-Allow-Origin': "http://localhost:5173/",
-            'content-Type': "application/json"
-        }),
-        body: body instanceof FormData ? body : JSON.stringify(body),
-        mode: "cors"
-    })
-    try {
-        let data = res.json()
-        return data
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-export async function asyncPatch(api: string, body: {} | FormData) {
-    const res: Response = await fetch(api, {
-        method: 'PATCH',
-        headers: new Headers({
-            'Access-Control-Allow-Origin': "http://localhost:5173/",
-        }),
-        body: body instanceof FormData ? body : JSON.stringify(body),
-        mode: "cors"
-    })
-    try {
-        let data = res.json()
-        return data
-    } catch (error) {
-        console.error(error)
-    }
-
-}
-/**
- * 異步執行 DELETE 請求
- * @param api 要呼叫的api url
- * @returns json 結果
- */
-export async function asyncDelete(api: string): Promise<any> {
-    try {
-        const res: Response = await fetch(api, {
-            method: 'DELETE',
-            headers: new Headers({
-                'Access-Control-Allow-Origin': "http://localhost:5173/",
-            }),
-            mode: "cors",
-        });
-        try {
-            return await res.json();
-        } catch (error) {
-            console.error("JSON 解析錯誤:", error);
-            return error;
-        }
-    } catch (error) {
-        console.error("請求錯誤:", error);
-        return error;
-    }
-}
-export async function asyncPut(api: string): Promise<any> {
-    try {
-        const res: Response = await fetch(api, {
-            method: 'PUT',
-            headers: new Headers({
-                'Access-Control-Allow-Origin': "http://localhost:5173/",
-            }),
-            mode: "cors",
-        });
-        try {
-            return await res.json();
-        } catch (error) {
-            console.error("JSON 解析錯誤:", error);
-            return error;
-        }
-    } catch (error) {
-        console.error("請求錯誤:", error);
-        return error;
-    }
-
-}
-/**
- * 異步呼叫單一 api, 用於獲取單一資源
- * @param api 要呼叫的api
- * @returns json 結果
- */
-export async function asyncGetOne(api: string): Promise<any> {
-    try {
-        const res: Response = await fetch(api)
-        try {
-            return await res.json()
-        } catch (error) {
-            return error
-        }
-    } catch (error) {
-        return error
-    }
-}
+const commonConfig = {
+    headers: {
+      'Access-Control-Allow-Origin': 'http://localhost:5173/',
+      'Content-Type': 'application/json',
+    },
+    mode: 'cors' as RequestMode,
+  };
+  
+  /**
+   * 異步呼叫 GET API，獲取所有餐廳
+   * @param api 要呼叫的api
+   * @returns json 結果
+   */
+  export async function asyncGet(api: string): Promise<any> {
+      try {
+          const res: Response = await fetch(api, {
+              ...commonConfig,
+              method: 'GET'
+          });
+          return await res.json();
+      } catch (error) {
+          console.error('GET request error:', error);
+          throw error;
+      }
+  }
+  
+  /**
+   * 異步呼叫 POST API，新增餐廳
+   * @param api API 端點
+   * @param body 餐廳資訊
+   * @returns json 結果
+   */
+  export async function asyncPost(api: string, body: {} | FormData) {
+      try {
+          const res: Response = await fetch(api, {
+              ...commonConfig,
+              method: 'POST',
+              body: JSON.stringify(body),
+          });
+          return await res.json();
+      } catch (error) {
+          console.error('POST request error:', error);
+          throw error;
+      }
+  }
+  
+  /**
+   * 異步執行 DELETE 請求，根據名稱刪除餐廳
+   * @param api API 端點
+   * @returns json 結果
+   */
+  export async function asyncDelete(api: string): Promise<any> {
+      try {
+          const res: Response = await fetch(api, {
+              ...commonConfig,
+              method: 'DELETE',
+          });
+          return await res.json();
+      } catch (error) {
+          console.error('DELETE request error:', error);
+          throw error;
+      }
+  }
+  
+  /**
+   * 異步執行 PUT 請求，更新餐廳名稱
+   * @param api API 端點 (包含 oldName 和 newName 查詢參數)
+   * @returns json 結果
+   */
+  export async function asyncPut(api: string): Promise<any> {
+      try {
+          const res: Response = await fetch(api, {
+              ...commonConfig,
+              method: 'PUT',
+          });
+          return await res.json();
+      } catch (error) {
+          console.error('PUT request error:', error);
+          throw error;
+      }
+  }
+  
+  /**
+   * 異步呼叫單一餐廳 API，根據名稱查找
+   * @param api API 端點 (包含 name 查詢參數)
+   * @returns json 結果
+   */
+  export async function asyncGetOne(api: string): Promise<any> {
+      try {
+          const res: Response = await fetch(api, {
+              ...commonConfig,
+              method: 'GET'
+          });
+          return await res.json();
+      } catch (error) {
+          console.error('GET ONE request error:', error);
+          throw error;
+      }
+  }
+  
+  /**
+   * 響應介面定義
+   */
+  export interface ApiResponse<T> {
+      code: number;
+      message: string;
+      body?: T;
+  }

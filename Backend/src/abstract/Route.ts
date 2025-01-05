@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { Contorller } from "./Contorller"
+import { Contorller } from "./Controller"
 
 export abstract class Route{
 
