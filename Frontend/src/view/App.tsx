@@ -20,6 +20,7 @@ function App() {
   const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
 
   const [formData, setFormData] = useState({
+    rid: '',    // 新增這行
     name: '',
     location: '',
     category: '',
@@ -75,17 +76,17 @@ function App() {
   };
 
   const handleAddRestaurant = async () => {
-    if (!formData.name || !formData.location || !formData.category || !formData.rating) {
+    if (!formData.rid || !formData.name || !formData.location || !formData.category || !formData.rating) {
       alert('請填寫所有欄位');
       return;
     }
-
+  
     try {
       const response = await asyncPost(api.insertOne, formData);
       if (response.code === 200) {
         alert('新增成功');
         fetchRestaurants();
-        setFormData({ name: '', location: '', category: '', rating: '' });
+        setFormData({ rid: '', name: '', location: '', category: '', rating: '' });  // 重設表單時也清空rid
       } else if (response.code === 400) {
         alert('餐廳名稱已存在');
       }
@@ -114,7 +115,7 @@ function App() {
           .slice(0, 5);
 
         setSearchResults(results);
-        
+
         if (results.length === 0) {
           alert('找不到相關餐廳');
         }
@@ -291,6 +292,12 @@ function App() {
             {activeTab === 'add' && (
               <div className="add-form">
                 <h2>新增餐廳</h2>
+                <input
+                  type="text"
+                  placeholder="餐廳編號"
+                  value={formData.rid}
+                  onChange={e => setFormData({ ...formData, rid: e.target.value })}
+                />
                 <input
                   type="text"
                   placeholder="餐廳名稱"
