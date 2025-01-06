@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import '../style/App.css';
 import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
 import HomePage from '../pages/HomePage';
 import SearchPage from '../pages/SearchPage';
 import AddPage from '../pages/AddPage';
@@ -9,13 +8,18 @@ import IntroPage from '../pages/introPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'intro' | 'home' | 'search' | 'add'>('intro');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="app-container">
       <div className="container">
-        <Header />
+        <Header 
+          currentPage={currentPage} 
+          setCurrentPage={setCurrentPage}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+        />
         <div className="content-wrapper">
-          <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
           <main className="main-content">
             {currentPage === 'intro' && <IntroPage />}
             {currentPage === 'home' && <HomePage />}
@@ -27,3 +31,5 @@ function App() {
     </div>
   );
 }
+
+export default App;
