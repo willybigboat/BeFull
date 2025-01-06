@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import '../style/App.css'
-import { asyncGet, asyncDelete, asyncPost, asyncPut, asyncGetOne } from '../utils/fetch'
+import { asyncGet, asyncDelete, asyncPost, asyncPut } from '../utils/fetch'
 import { api } from '../enum/api'
 import pic1 from '../images/Group 25.png'
 
@@ -32,7 +32,12 @@ function App() {
 
   const areas = [
     '北投區', '士林區', '大同區', '中山區', '松山區', '內湖區',
-    '萬華區', '中正區', '大安區', '信義區', '南港區', '文山區'
+    '萬華區', '中正區', '大安區', '信義區', '南港區', '文山區',
+    '板橋區', '三重區', '中和區', '永和區', '新莊區', '新店區',
+    '土城區', '蘆洲區', '樹林區', '汐止區', '鶯歌區', '三峽區',
+    '淡水區', '瑞芳區', '五股區', '泰山區', '林口區', '深坑區',
+    '石碇區', '坪林區', '三芝區', '石門區', '八里區', '平溪區',
+    '雙溪區', '貢寮區', '金山區', '萬里區', '烏來區'
   ];
 
   const calculateSimilarity = (str1: string, str2: string): number => {
@@ -80,7 +85,7 @@ function App() {
       alert('請填寫所有欄位');
       return;
     }
-  
+
     try {
       const response = await asyncPost(api.insertOne, formData);
       if (response.code === 200) {
@@ -106,13 +111,9 @@ function App() {
       const response = await asyncGet(api.findAll);
       if (response.code === 200 && response.body) {
         const results = response.body
-          .map((restaurant: { name: string }) => ({
-            ...restaurant,
-            similarity: calculateSimilarity(restaurant.name, searchName)
-          }))
-          .filter((r: { similarity: number }) => r.similarity > 0.3)
-          .sort((a: { similarity: number }, b: { similarity: number }) => b.similarity - a.similarity)
-          .slice(0, 5);
+          .filter((restaurant: { name: string }) => 
+            restaurant.name.toLowerCase().includes(searchName.toLowerCase())
+          );
 
         setSearchResults(results);
 
@@ -122,10 +123,10 @@ function App() {
       }
     } catch (error) {
       alert('搜尋失敗');
-      console.error(error);
+      console.error(error); 
     }
   };
-
+  
   const handleUpdate = async (currentName: string) => {
     if (!updateName) {
       alert('請輸入新名稱');

@@ -88,7 +88,7 @@ const commonConfig = {
    * @param api API 端點 (包含 name 查詢參數)
    * @returns json 結果
    */
-  export async function asyncGetOne(api: string): Promise<any> {
+  export async function asyncsearch(api: string): Promise<any> {
       try {
           const res: Response = await fetch(api, {
               ...commonConfig,

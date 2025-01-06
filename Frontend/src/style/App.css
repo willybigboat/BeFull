@@ -8,14 +8,15 @@ body {
   background-color: #000;
   color: #fff;
   font-size: 20px;
-  width: 100%;
+  width: 100vw; /* 設定為視窗寬度 */
+  overflow-x: hidden; /* 防止水平捲軸 */
   display: flex;
   justify-content: center;
 }
 
 /* 修改 container，移除最大寬度限制 */
 .container {
-  width: 100%;
+  width: 100vw;
   min-height: 100vh;
   padding: 0;  /* 移除 padding */
   margin: 0;   /* 移除 margin */
@@ -23,7 +24,7 @@ body {
 
 /* 修改 app-container，確保全寬 */
 .app-container {
-  width: 100%;
+  width: 100vw;
   min-height: 100vh;
   background-color: #000;
   display: flex;
@@ -34,7 +35,7 @@ body {
 .content-wrapper {
   display: grid;
   grid-template-columns: minmax(200px, 15%) 1fr;
-  width: 100%;
+  width: 100vw;
   margin: 0;  /* 移除 margin */
 }
 
@@ -75,7 +76,7 @@ body {
 .logo h1 {
   color: #FFD700;
   margin: 0;
-  font-size: 24px;
+  font-size: 30px;
 }
 
 .sidebar {
