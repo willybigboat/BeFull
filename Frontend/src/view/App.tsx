@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../style/App.css';
 import Header from '../components/Header';
 import HomePage from '../pages/HomePage';
@@ -7,9 +7,15 @@ import AddPage from '../pages/AddPage';
 import IntroPage from '../pages/introPage';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'intro' | 'home' | 'search' | 'add'>('intro');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'intro' | 'home' | 'search' | 'add'>(() => {
+    const savedPage = localStorage.getItem('currentPage');
+    return (savedPage as 'intro' | 'home' | 'search' | 'add') || 'intro';
+  });
 
+  useEffect(() => {
+    localStorage.setItem('currentPage', currentPage);
+  }, [currentPage]);
   return (
     <div className="app-container">
       <div className="container">
@@ -30,6 +36,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;

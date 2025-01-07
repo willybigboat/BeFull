@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { asyncGet, asyncDelete } from '../utils/fetch';
 import { api } from '../enum/api';
 import { restaurant } from '../interface/restaurant';
-import { areas } from '../constants/areas';
+import { areas, areasNTP } from '../constants/areas';
 
 const HomePage = () => {
   const [restaurants, setRestaurants] = useState<restaurant[]>([]);
@@ -16,9 +16,13 @@ const HomePage = () => {
   useEffect(() => {
     if (selectedArea) {
       const filtered = restaurants.filter(r => r.location.includes(selectedArea));
-      setFilteredRestaurants(filtered);
+      // 保持排序
+      const sortedFiltered = [...filtered].sort((a, b) => Number(a.rid) - Number(b.rid));
+      setFilteredRestaurants(sortedFiltered);
     } else {
-      setFilteredRestaurants(restaurants);
+      // 全部顯示時也要排序
+      const sortedAll = [...restaurants].sort((a, b) => Number(a.rid) - Number(b.rid));
+      setFilteredRestaurants(sortedAll);
     }
   }, [selectedArea, restaurants]);
 
@@ -26,8 +30,10 @@ const HomePage = () => {
     try {
       const response = await asyncGet(api.findAll);
       if (response.code === 200 && response.body) {
-        setRestaurants(response.body);
-        setFilteredRestaurants(response.body);
+        // 獲取資料時先排序
+        const sortedRestaurants = response.body.sort((a: { rid: any; }, b: { rid: any; }) => Number(a.rid) - Number(b.rid));
+        setRestaurants(sortedRestaurants);
+        setFilteredRestaurants(sortedRestaurants);
       }
     } catch (error) {
       console.error('獲取餐廳列表失敗:', error);
@@ -52,27 +58,44 @@ const HomePage = () => {
   return (
     <div className="home-section">
       <div className="area-filters">
-        <button
-          className={selectedArea === '' ? 'selected' : ''}
-          onClick={() => setSelectedArea('')}
-        >
-          全部地區
-        </button>
-        {areas.map(area => (
+        <div className='all-areas'>
           <button
-            key={area}
-            className={selectedArea === area ? 'selected' : ''}
-            onClick={() => setSelectedArea(area)}
+            className={selectedArea === '' ? 'selected' : ''}
+            onClick={() => setSelectedArea('')}
           >
-            {area}
+            全部地區
           </button>
-        ))}
+        </div>
+        <div className='area-group'>
+          <p>台北市</p>
+          {areas.map(area => (
+            <button
+              key={area}
+              className={selectedArea === area ? 'selected' : ''}
+              onClick={() => setSelectedArea(area)}
+            >
+              {area}
+            </button>
+          ))}
+        </div>
+        <div className='area-group'>
+          <p>新北市</p>
+          {areasNTP.map(area1 => (
+            <button
+              key={area1}
+              className={selectedArea === area1 ? 'selected' : ''}
+              onClick={() => setSelectedArea(area1)}
+            >
+              {area1}
+            </button>          
+          ))}
+        </div>
       </div>
 
       <div className="restaurant-list">
         {filteredRestaurants.map(restaurant => (
           <div key={restaurant._id} className="restaurant-card">
-            <h3>{restaurant.name}</h3>
+            <h3>#{restaurant.rid} {restaurant.name}</h3>
             <p>地址: {restaurant.location}</p>
             <p>類別: {restaurant.category}</p>
             <p>評分: {restaurant.rating}</p>

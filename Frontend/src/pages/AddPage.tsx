@@ -17,6 +17,12 @@ const AddPage = () => {
       return;
     }
 
+    const rating = parseFloat(formData.rating);
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      alert('評分必須介於1到5之間');
+      return;
+    }
+
     try {
       const response = await asyncPost(api.insertOne, formData);
       if (response.code === 200) {
@@ -28,6 +34,13 @@ const AddPage = () => {
     } catch (error) {
       alert('新增失敗');
       console.error(error);
+    }
+  };
+
+  const handleRatingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || (parseFloat(value) >= 1 && parseFloat(value) <= 5)) {
+      setFormData({ ...formData, rating: value });
     }
   };
 
@@ -59,10 +72,13 @@ const AddPage = () => {
         onChange={e => setFormData({ ...formData, category: e.target.value })}
       />
       <input
-        type="text"
-        placeholder="評分"
+        type="number"
+        placeholder="評分 (1-5)"
         value={formData.rating}
-        onChange={e => setFormData({ ...formData, rating: e.target.value })}
+        onChange={handleRatingChange}
+        min="1"
+        max="5"
+        step="1"
       />
       <button onClick={handleAddRestaurant}>新增</button>
     </div>
